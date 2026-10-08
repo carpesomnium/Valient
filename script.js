@@ -1,5 +1,10 @@
 document.body.classList.add("js");
 
+// drop stale #links (e.g. an old #models) so they don't point at nothing
+if (location.hash && !document.getElementById(decodeURIComponent(location.hash.slice(1)))) {
+  history.replaceState(null, "", location.pathname + location.search);
+}
+
 // ============ settings ============
 // Song for the background music. Set `youtube` to a video ID (the part after
 // "v=" in a YouTube link), or drop your own audio file in the repo and set
