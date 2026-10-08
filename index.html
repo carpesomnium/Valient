@@ -2,58 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>VALIENT // nes</title>
-  <meta name="description" content="Portfolio of nes: 3D models and Luau scripting projects.">
-  <meta name="theme-color" content="#030a1c">
+  <meta name="description" content="Portfolio of nes: 3D models and more.">
+  <meta name="theme-color" content="#0b1b22">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@1,600;1,800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <noscript><style>#gate{display:none}</style></noscript>
 </head>
 <body>
-  <canvas id="bg" aria-hidden="true"></canvas>
-  <div class="scan" aria-hidden="true"></div>
+  <!-- entry gate: the tap also unlocks audio -->
+  <div id="gate">
+    <div class="gate-inner">
+      <p class="mono">// press start</p>
+      <h1 class="gate-logo" data-r>VALIENT</h1>
+      <button id="enter" type="button"><span>Enter &#9834;</span></button>
+      <button id="enter-mute" type="button" class="quiet">enter without music</button>
+    </div>
+  </div>
+
+  <!-- background -->
+  <div class="bg" aria-hidden="true">
+    <svg class="splash" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency=".015 .045" numOctaves="4" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="70"/>
+        </filter>
+      </defs>
+      <g filter="url(#rough)" fill="#e8334a">
+        <polygon points="-80,90 520,10 690,230 500,330 -80,400"/>
+        <rect x="120" y="300" width="14" height="120" rx="7"/>
+        <rect x="300" y="310" width="10" height="80" rx="5"/>
+        <rect x="430" y="300" width="12" height="150" rx="6"/>
+        <circle cx="620" cy="90" r="34"/>
+        <circle cx="700" cy="330" r="16"/>
+        <circle cx="90" cy="500" r="22"/>
+      </g>
+    </svg>
+    <canvas id="bg"></canvas>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
 
   <header class="hero" id="top">
-    <p class="tag">// i love the world and everything in it</p>
-    <h1 class="logo" data-text="VALIENT">VALIENT</h1>
-    <p class="alias">alias <b>nes</b> &mdash; 3D artist &amp; Luau scripter</p>
+    <p class="mono tag">// i love the world and everything in it</p>
+    <h1 class="logo" data-r aria-label="Valient">VALIENT</h1>
 
-    <nav class="menu" aria-label="Main">
-      <a href="#about"><i>01</i><span>About</span></a>
-      <a href="#models"><i>02</i><span>3D Models</span></a>
-      <a href="#scripts"><i>03</i><span>Luau Scripts</span></a>
-      <a href="#contact"><i>04</i><span>Contact</span></a>
+    <div class="numeral" id="numeral" aria-hidden="true">01</div>
+
+    <nav class="menu" id="menu" aria-label="Main">
+      <a href="#about"><span class="lbl" data-r="soft">About</span><small>who is nes</small></a>
+      <a href="#models"><span class="lbl" data-r="soft">3D Models</span><small>mesh &amp; material</small></a>
+      <a href="#contact"><span class="lbl" data-r="soft">Contact</span><small>say hello</small></a>
+      <a href="https://github.com/carpesomnium" target="_blank" rel="noopener"><span class="lbl" data-r="soft">GitHub</span><small>carpesomnium</small></a>
+      <a href="#contact" data-copy="kerosionn" class="copy"><span class="lbl" data-r="soft">Discord</span><small>tap to copy @kerosionn</small></a>
     </nav>
 
-    <a class="scroll" href="#about" aria-label="Scroll down">&darr;</a>
+    <div class="bars" aria-hidden="true">
+      <div class="bar"><small>ALIAS</small><b>nes</b></div>
+      <div class="bar"><small>CRAFT</small><b>3D &middot; Luau</b></div>
+    </div>
   </header>
 
   <div class="ticker" aria-hidden="true">
     <div class="track">
-      <span>I LOVE THE WORLD AND EVERYTHING IN IT // MODEL // SCRIPT // BUILD // </span>
-      <span>I LOVE THE WORLD AND EVERYTHING IN IT // MODEL // SCRIPT // BUILD // </span>
-      <span>I LOVE THE WORLD AND EVERYTHING IN IT // MODEL // SCRIPT // BUILD // </span>
+      <span>I LOVE THE WORLD AND EVERYTHING IN IT &#9733; MODEL &#9733; SCRIPT &#9733; BUILD &#9733; </span>
+      <span>I LOVE THE WORLD AND EVERYTHING IN IT &#9733; MODEL &#9733; SCRIPT &#9733; BUILD &#9733; </span>
+      <span>I LOVE THE WORLD AND EVERYTHING IN IT &#9733; MODEL &#9733; SCRIPT &#9733; BUILD &#9733; </span>
     </div>
   </div>
 
   <main>
-    <section id="about">
-      <h2><em>01</em> About</h2>
-      <div class="panel about">
+    <section id="about" class="reveal">
+      <h2 data-r><em>01</em>About</h2>
+      <div class="panel">
         <p>I'm <b>nes</b>. I make 3D models and write Luau, mostly for Roblox. I like building small worlds that feel alive, from the mesh to the code that makes it move.</p>
-        <p>Replace this paragraph with your own story: how you started, what you're into, what you're working on.</p>
+        <p class="sub">Replace this paragraph with your own story: how you started, what you're into, what you're working on.</p>
         <ul class="stats">
-          <li><b>3D</b><span>Blender / modeling</span></li>
-          <li><b>Luau</b><span>Roblox scripting</span></li>
+          <li><b>3D</b><span>Modeling</span></li>
+          <li><b>Luau</b><span>Scripting</span></li>
           <li><b>&infin;</b><span>Curiosity</span></li>
         </ul>
       </div>
     </section>
 
-    <section id="models">
-      <h2><em>02</em> 3D Models</h2>
+    <section id="models" class="reveal">
+      <h2 data-r><em>02</em>3D Models</h2>
       <div class="grid">
         <article class="card">
           <div class="thumb t1"><span>IMG</span></div>
@@ -76,44 +112,13 @@
       </div>
     </section>
 
-    <section id="scripts">
-      <h2><em>03</em> Luau Scripts</h2>
-      <div class="grid">
-        <article class="card">
-          <div class="thumb code"><pre>local Players = game:GetService("Players")
-Players.PlayerAdded:Connect(function(p)
-  print("welcome", p.Name)
-end)</pre></div>
-          <h3>Project Name 01</h3>
-          <p>What it does and what you built it with.</p>
-          <a href="https://github.com/carpesomnium" class="more">Source &rarr;</a>
-        </article>
-        <article class="card">
-          <div class="thumb code"><pre>local function lerp(a, b, t)
-  return a + (b - a) * t
-end</pre></div>
-          <h3>Project Name 02</h3>
-          <p>What it does and what you built it with.</p>
-          <a href="https://github.com/carpesomnium" class="more">Source &rarr;</a>
-        </article>
-        <article class="card">
-          <div class="thumb code"><pre>RunService.Heartbeat:Connect(function(dt)
-  -- update the world
-end)</pre></div>
-          <h3>Project Name 03</h3>
-          <p>What it does and what you built it with.</p>
-          <a href="https://github.com/carpesomnium" class="more">Source &rarr;</a>
-        </article>
-      </div>
-    </section>
-
-    <section id="contact">
-      <h2><em>04</em> Contact</h2>
-      <div class="panel links">
+    <section id="contact" class="reveal">
+      <h2 data-r><em>03</em>Contact</h2>
+      <div class="links">
         <a class="big" href="https://github.com/carpesomnium" target="_blank" rel="noopener">
           <small>GitHub</small><span>carpesomnium</span>
         </a>
-        <button class="big" id="discord" type="button" data-copy="kerosionn">
+        <button class="big" type="button" data-copy="kerosionn">
           <small>Discord &mdash; tap to copy</small><span>@kerosionn</span>
         </button>
       </div>
@@ -124,6 +129,17 @@ end)</pre></div>
     <span>VALIENT // nes</span>
     <a href="#top">back to top &uarr;</a>
   </footer>
+
+  <!-- music: a small visible player (see MUSIC in script.js to change the song) -->
+  <aside id="player" class="player" aria-label="Music player">
+    <div class="p-head">
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="p-title">Color Your Night</span>
+      <button id="p-toggle" type="button" aria-label="Minimize music player">&times;</button>
+    </div>
+    <div class="p-body"><div id="yt"></div></div>
+    <p class="p-note" id="p-note" hidden></p>
+  </aside>
 
   <script src="script.js"></script>
 </body>
