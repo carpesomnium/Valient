@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VALIENT // nes</title>
+  <meta name="description" content="Portfolio of nes: 3D models and Luau scripting projects.">
+  <meta name="theme-color" content="#030a1c">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@1,600;1,800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="scan" aria-hidden="true"></div>
+
+  <header class="hero" id="top">
+    <p class="tag">// i love the world and everything in it</p>
+    <h1 class="logo" data-text="VALIENT">VALIENT</h1>
+    <p class="alias">alias <b>nes</b> &mdash; 3D artist &amp; Luau scripter</p>
+
+    <nav class="menu" aria-label="Main">
+      <a href="#about"><i>01</i><span>About</span></a>
+      <a href="#models"><i>02</i><span>3D Models</span></a>
+      <a href="#scripts"><i>03</i><span>Luau Scripts</span></a>
+      <a href="#contact"><i>04</i><span>Contact</span></a>
+    </nav>
+
+    <a class="scroll" href="#about" aria-label="Scroll down">&darr;</a>
+  </header>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="track">
+      <span>I LOVE THE WORLD AND EVERYTHING IN IT // MODEL // SCRIPT // BUILD // </span>
+      <span>I LOVE THE WORLD AND EVERYTHING IN IT // MODEL // SCRIPT // BUILD // </span>
+      <span>I LOVE THE WORLD AND EVERYTHING IN IT // MODEL // SCRIPT // BUILD // </span>
+    </div>
+  </div>
+
+  <main>
+    <section id="about">
+      <h2><em>01</em> About</h2>
+      <div class="panel about">
+        <p>I'm <b>nes</b>. I make 3D models and write Luau, mostly for Roblox. I like building small worlds that feel alive, from the mesh to the code that makes it move.</p>
+        <p>Replace this paragraph with your own story: how you started, what you're into, what you're working on.</p>
+        <ul class="stats">
+          <li><b>3D</b><span>Blender / modeling</span></li>
+          <li><b>Luau</b><span>Roblox scripting</span></li>
+          <li><b>&infin;</b><span>Curiosity</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="models">
+      <h2><em>02</em> 3D Models</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="thumb t1"><span>IMG</span></div>
+          <h3>Model Name 01</h3>
+          <p>Short description. Tools used, poly count, what it is.</p>
+          <a href="#" class="more">View &rarr;</a>
+        </article>
+        <article class="card">
+          <div class="thumb t2"><span>IMG</span></div>
+          <h3>Model Name 02</h3>
+          <p>Short description. Tools used, poly count, what it is.</p>
+          <a href="#" class="more">View &rarr;</a>
+        </article>
+        <article class="card">
+          <div class="thumb t3"><span>IMG</span></div>
+          <h3>Model Name 03</h3>
+          <p>Short description. Tools used, poly count, what it is.</p>
+          <a href="#" class="more">View &rarr;</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="scripts">
+      <h2><em>03</em> Luau Scripts</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="thumb code"><pre>local Players = game:GetService("Players")
+Players.PlayerAdded:Connect(function(p)
+  print("welcome", p.Name)
+end)</pre></div>
+          <h3>Project Name 01</h3>
+          <p>What it does and what you built it with.</p>
+          <a href="https://github.com/chicken123x1-create" class="more">Source &rarr;</a>
+        </article>
+        <article class="card">
+          <div class="thumb code"><pre>local function lerp(a, b, t)
+  return a + (b - a) * t
+end</pre></div>
+          <h3>Project Name 02</h3>
+          <p>What it does and what you built it with.</p>
+          <a href="https://github.com/chicken123x1-create" class="more">Source &rarr;</a>
+        </article>
+        <article class="card">
+          <div class="thumb code"><pre>RunService.Heartbeat:Connect(function(dt)
+  -- update the world
+end)</pre></div>
+          <h3>Project Name 03</h3>
+          <p>What it does and what you built it with.</p>
+          <a href="https://github.com/chicken123x1-create" class="more">Source &rarr;</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2><em>04</em> Contact</h2>
+      <div class="panel links">
+        <a class="big" href="https://github.com/chicken123x1-create" target="_blank" rel="noopener">
+          <small>GitHub</small><span>chicken123x1-create</span>
+        </a>
+        <button class="big" id="discord" type="button" data-copy="kerosionn">
+          <small>Discord &mdash; tap to copy</small><span>@kerosionn</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>VALIENT // nes</span>
+    <a href="#top">back to top &uarr;</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
