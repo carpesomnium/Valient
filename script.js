@@ -57,7 +57,7 @@ const MUSIC = {
     specks = Array.from({ length: Math.round(canvas.clientWidth / 16) }, () => ({
       x: Math.random() * w, y: Math.random() * h,
       s: (0.6 + Math.random() * 1.6) * dpr, v: (0.25 + Math.random()) * dpr,
-      c: Math.random() < 0.3 ? "232,51,74" : "255,255,255",
+      c: Math.random() < 0.3 ? "110,175,255" : "255,255,255",
     }));
   }
   addEventListener("resize", resize);
@@ -159,6 +159,118 @@ const MUSIC = {
   });
 })();
 
+
+// ============ glass shatter ============
+function shatterGate(gate, ox, oy, onStart) {
+  const rect = gate.getBoundingClientRect(), W = rect.width, H = rect.height;
+  const K = 11, R = 4;                         // spokes, rings
+  const far = Math.hypot(W, H) * 1.2;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  // shared vertex grid so neighbouring shards meet exactly
+  const angs = [], base = rnd(0, Math.PI * 2);
+  for (let j = 0; j < K; j++) angs.push(base + (j + rnd(-0.25, 0.25)) * (Math.PI * 2 / K));
+  const radii = [0, 0.09, 0.22, 0.42, 1].map((f, i) => (i === 0 ? 0 : i === R ? far : f * Math.hypot(W, H) * 0.7));
+  const V = [];
+  for (let i = 0; i <= R; i++) {
+    V.push([]);
+    for (let j = 0; j < K; j++) {
+      const r = i === 0 ? 0 : radii[i] * (i === R ? 1 : rnd(0.85, 1.15));
+      V[i].push([ox + Math.cos(angs[j]) * r, oy + Math.sin(angs[j]) * r]);
+    }
+  }
+
+  const box = document.createElement("div");
+  box.className = "shatter"; box.setAttribute("aria-hidden", "true");
+  const shards = [];
+  for (let i = 0; i < R; i++) for (let j = 0; j < K; j++) {
+    const j2 = (j + 1) % K;
+    const pts = [V[i][j], V[i][j2], V[i + 1][j2], V[i + 1][j]];
+    const cx = pts.reduce((s, p) => s + Math.min(Math.max(p[0], 0), W), 0) / 4;
+    const cy = pts.reduce((s, p) => s + Math.min(Math.max(p[1], 0), H), 0) / 4;
+    const el = gate.cloneNode(true);
+    el.classList.remove("out"); el.classList.add("shard"); // ids stay so the copy keeps the gate styling
+    el.style.clipPath = "polygon(" + pts.map((p) => p[0].toFixed(1) + "px " + p[1].toFixed(1) + "px").join(",") + ")";
+    el.style.transformOrigin = cx.toFixed(0) + "px " + cy.toFixed(0) + "px";
+    box.append(el); shards.push({ el, cx, cy, ring: i });
+  }
+  const cv = document.createElement("canvas");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  cv.width = W * dpr; cv.height = H * dpr;
+  box.append(cv);
+  document.body.append(box);
+  gate.classList.add("gone");
+  onStart && onStart();
+
+  // phase 1: cracks spread from the hit
+  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
+  const CRACK = 260, t0 = performance.now();
+  (function draw(now) {
+    const p = Math.min((now - t0) / CRACK, 1), reach = p * R;
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.shadowColor = "#7bb6ff"; ctx.shadowBlur = 10;
+    ctx.lineWidth = 2.2; ctx.beginPath();
+    for (let j = 0; j < K; j++) {                       // spokes
+      ctx.moveTo(ox, oy);
+      for (let i = 1; i <= R; i++) {
+        const f = Math.min(Math.max(reach - (i - 1), 0), 1); if (!f) break;
+        const a = V[i - 1][j], b = V[i][j];
+        ctx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f);
+      }
+    }
+    for (let i = 1; i < R; i++) {                       // rings
+      if (reach < i) break;
+      for (let j = 0; j < K; j++) { const a = V[i][j], b = V[i][(j + 1) % K]; ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
+    }
+    ctx.stroke();
+    if (p < 1) requestAnimationFrame(draw);
+  })(t0);
+
+  // phase 2: the pieces fall away
+  let longest = 0;
+  setTimeout(() => {
+    cv.style.transition = "opacity .25s"; cv.style.opacity = "0";
+    shards.forEach(({ el, cx, cy, ring }) => {
+      const dx = cx - ox, dy = cy - oy, d = Math.hypot(dx, dy) || 1;
+      const push = rnd(30, 150) * (1 + (R - ring) * 0.15);
+      const tx = (dx / d) * push + rnd(-30, 30);
+      const ty = (dy / d) * push * 0.4 + H * rnd(0.55, 1.05);
+      const rot = rnd(-260, 260);
+      const dur = rnd(900, 1500), delay = ring * 45 + rnd(0, 120);
+      longest = Math.max(longest, dur + delay);
+      el.animate([
+        { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+        { transform: "translate(" + tx * 0.2 + "px," + ty * 0.03 + "px) rotate(" + rot * 0.12 + "deg)", opacity: 1, offset: 0.18 },
+        { transform: "translate(" + tx + "px," + ty + "px) rotate(" + rot + "deg)", opacity: 0 },
+      ], { duration: dur, delay, easing: "cubic-bezier(.45,0,.85,.55)", fill: "forwards" });
+    });
+    setTimeout(() => { box.remove(); gate.remove(); }, longest + 100);
+  }, CRACK);
+
+  // quick impact shake
+  document.body.classList.add("shake");
+  setTimeout(() => document.body.classList.remove("shake"), 300);
+}
+
+function glassSound() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    const ac = new AC(), t = ac.currentTime, out = ac.createGain(); out.gain.value = 0.28; out.connect(ac.destination);
+    const len = Math.floor(ac.sampleRate * 0.8), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3) * (Math.random() < 0.03 ? 1.8 : 1);
+    const n = ac.createBufferSource(); n.buffer = buf;
+    const hp = ac.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 2500;
+    n.connect(hp); hp.connect(out); n.start(t);
+    for (let k = 0; k < 7; k++) {                       // tinkles
+      const o = ac.createOscillator(), g = ac.createGain(), at = t + 0.05 + Math.random() * 0.5;
+      o.frequency.value = 2500 + Math.random() * 4500; o.type = "sine";
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.25, at + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.18);
+      o.connect(g); g.connect(out); o.start(at); o.stop(at + 0.2);
+    }
+    setTimeout(() => ac.close(), 1500);
+  } catch (e) {}
+}
+
 // ============ gate + music ============
 (function () {
   const gate = document.getElementById("gate");
@@ -206,13 +318,21 @@ const MUSIC = {
     else if (ytReady) yt.pauseVideo();
   }
 
-  function enter(withMusic) {
-    gate.classList.add("out");
-    document.body.classList.add("entered");
-    if (withMusic) play(); else { player.classList.add("min"); toggle.setAttribute("aria-label", "Open music player"); }
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function enter(withMusic, e, btn) {
+    const go = () => {
+      document.body.classList.add("entered");
+      if (withMusic) play(); else { player.classList.add("min"); toggle.setAttribute("aria-label", "Open music player"); }
+    };
+    if (calm) { gate.classList.add("out"); go(); return; }
+    const r = btn.getBoundingClientRect();
+    const x = e && e.clientX ? e.clientX : r.left + r.width / 2, y = e && e.clientY ? e.clientY : r.top + r.height / 2;
+    if (withMusic) glassSound();
+    shatterGate(gate, x, y, go);
   }
-  document.getElementById("enter").addEventListener("click", () => enter(true));
-  document.getElementById("enter-mute").addEventListener("click", () => enter(false));
+  const enterBtn = document.getElementById("enter"), muteBtn = document.getElementById("enter-mute");
+  enterBtn.addEventListener("click", (e) => enter(true, e, enterBtn), { once: true });
+  muteBtn.addEventListener("click", (e) => enter(false, e, muteBtn), { once: true });
 
   toggle.addEventListener("click", () => {
     const minimized = player.classList.toggle("min");
