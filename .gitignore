@@ -1,0 +1,8 @@
+# secrets / API keys: never commit these
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+config.local.*
+.claude/settings.local.json
