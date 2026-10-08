@@ -160,108 +160,125 @@ const MUSIC = {
 })();
 
 
-// ============ glass shatter ============
+// ============ glass shatter (one canvas, no DOM copies: light enough for phones) ============
 function shatterGate(gate, ox, oy, onStart) {
   const rect = gate.getBoundingClientRect(), W = rect.width, H = rect.height;
-  const K = 10, R = 4;                         // spokes, rings
-  const far = Math.hypot(W, H) * 1.2;
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
   const rnd = (a, b) => a + Math.random() * (b - a);
+  const css = getComputedStyle(document.documentElement);
+  const BLUE = "#3f86ff", DARK = "#040a1e";
 
-  // shared vertex grid so neighbouring shards meet exactly
-  const angs = [], base = rnd(0, Math.PI * 2);
+  // what the entry screen looks like (read live positions so it lines up)
+  const logoParts = [...gate.querySelectorAll(".gate-logo span")].map((s) => {
+    const r = s.getBoundingClientRect(), cs = getComputedStyle(s);
+    return { t: s.getAttribute("aria-label") || s.textContent, x: r.left + r.width / 2, y: r.top + r.height / 2, fs: parseFloat(cs.fontSize) };
+  });
+  const btn = gate.querySelector("#enter").getBoundingClientRect();
+
+  // shatter geometry: spokes + rings around the hit point
+  const K = 10, R = 4, far = Math.hypot(W, H) * 1.3, diag = Math.hypot(W, H);
+  const base = rnd(0, Math.PI * 2), angs = [];
   for (let j = 0; j < K; j++) angs.push(base + (j + rnd(-0.25, 0.25)) * (Math.PI * 2 / K));
-  const radii = [0, 0.09, 0.22, 0.42, 1].map((f, i) => (i === 0 ? 0 : i === R ? far : f * Math.hypot(W, H) * 0.7));
+  const rr = [0, 0.09, 0.22, 0.42].map((f) => f * diag * 0.7);
   const V = [];
   for (let i = 0; i <= R; i++) {
     V.push([]);
     for (let j = 0; j < K; j++) {
-      const r = i === 0 ? 0 : radii[i] * (i === R ? 1 : rnd(0.85, 1.15));
+      const r = i === 0 ? 0 : i === R ? far : rr[i] * rnd(0.85, 1.15);
       V[i].push([ox + Math.cos(angs[j]) * r, oy + Math.sin(angs[j]) * r]);
     }
   }
-
-  const box = document.createElement("div");
-  box.className = "shatter"; box.setAttribute("aria-hidden", "true");
   const shards = [];
   for (let i = 0; i < R; i++) for (let j = 0; j < K; j++) {
-    const j2 = (j + 1) % K;
-    const pts = [V[i][j], V[i][j2], V[i + 1][j2], V[i + 1][j]];
+    const pts = [V[i][j], V[i][(j + 1) % K], V[i + 1][(j + 1) % K], V[i + 1][j]];
     const cx = pts.reduce((s, p) => s + Math.min(Math.max(p[0], 0), W), 0) / 4;
     const cy = pts.reduce((s, p) => s + Math.min(Math.max(p[1], 0), H), 0) / 4;
-    // each shard is only as big as its own bounding box (keeps phone memory low)
-    const xs = pts.map((p) => Math.min(Math.max(p[0], 0), W)), ys = pts.map((p) => Math.min(Math.max(p[1], 0), H));
-    const bx = Math.max(Math.floor(Math.min(...xs)) - 2, 0), by = Math.max(Math.floor(Math.min(...ys)) - 2, 0);
-    const bw = Math.min(Math.ceil(Math.max(...xs)) + 2, W) - bx, bh = Math.min(Math.ceil(Math.max(...ys)) + 2, H) - by;
-    if (bw <= 0 || bh <= 0) continue;
-    const el = document.createElement("div");
-    el.className = "shard";
-    el.style.cssText = "left:" + bx + "px;top:" + by + "px;width:" + bw + "px;height:" + bh + "px;" +
-      "clip-path:polygon(" + pts.map((p) => (p[0] - bx).toFixed(1) + "px " + (p[1] - by).toFixed(1) + "px").join(",") + ");" +
-      "transform-origin:" + (cx - bx).toFixed(0) + "px " + (cy - by).toFixed(0) + "px;";
-    const inner = gate.cloneNode(true);     // ids stay so the copy keeps the gate styling
-    inner.classList.remove("out");
-    inner.style.cssText = "position:absolute;inset:auto;left:" + -bx + "px;top:" + -by + "px;width:" + W + "px;height:" + H + "px;transition:none;";
-    el.append(inner);
-    box.append(el); shards.push({ el, cx, cy, ring: i });
+    const dx = cx - ox, dy = cy - oy, d = Math.hypot(dx, dy) || 1, push = rnd(30, 150) * (1 + (R - i) * 0.15);
+    shards.push({
+      pts, cx, cy, ring: i,
+      tx: (dx / d) * push + rnd(-30, 30), ty: (dy / d) * push * 0.4 + H * rnd(0.55, 1.05),
+      rot: rnd(-4.5, 4.5), dur: rnd(900, 1500), delay: 260 + i * 45 + rnd(0, 120),
+    });
   }
+
   const cv = document.createElement("canvas");
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  cv.width = W * dpr; cv.height = H * dpr;
-  box.append(cv);
-  document.body.append(box);
+  cv.className = "shatter"; cv.setAttribute("aria-hidden", "true");
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  document.body.append(cv);
+  const ctx = cv.getContext("2d");
   gate.classList.add("gone");
   onStart && onStart();
 
-  // phase 1: cracks spread from the hit
-  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-  const CRACK = 260, t0 = performance.now();
-  (function draw(now) {
-    const p = Math.min((now - t0) / CRACK, 1), reach = p * R;
-    ctx.clearRect(0, 0, W, H);
-    ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.shadowColor = "#7bb6ff"; ctx.shadowBlur = 10;
-    ctx.lineWidth = 2.2; ctx.beginPath();
-    for (let j = 0; j < K; j++) {                       // spokes
-      ctx.moveTo(ox, oy);
-      for (let i = 1; i <= R; i++) {
-        const f = Math.min(Math.max(reach - (i - 1), 0), 1); if (!f) break;
-        const a = V[i - 1][j], b = V[i][j];
-        ctx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f);
-      }
+  function paintGate() {
+    ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H);
+    // diagonal band (115deg gradient between 38% and 62%)
+    const th = 115 * Math.PI / 180, dx = Math.sin(th), dy = -Math.cos(th), L = Math.abs(W * dx) + Math.abs(H * dy);
+    const sx = W / 2 - dx * L / 2, sy = H / 2 - dy * L / 2, px = -dy, py = dx;
+    const at = (f) => [sx + dx * L * f, sy + dy * L * f];
+    const [a, b] = [at(0.38), at(0.62)];
+    ctx.fillStyle = BLUE; ctx.beginPath();
+    ctx.moveTo(a[0] + px * far, a[1] + py * far); ctx.lineTo(b[0] + px * far, b[1] + py * far);
+    ctx.lineTo(b[0] - px * far, b[1] - py * far); ctx.lineTo(a[0] - px * far, a[1] - py * far); ctx.fill();
+    // title
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+    for (const p of logoParts) {
+      ctx.font = "900 " + p.fs + "px 'Playfair Display', serif";
+      ctx.fillStyle = "#000"; ctx.fillText(p.t, p.x + 5, p.y + 5);
+      ctx.fillStyle = "#fff"; ctx.fillText(p.t, p.x, p.y);
     }
-    for (let i = 1; i < R; i++) {                       // rings
-      if (reach < i) break;
-      for (let j = 0; j < K; j++) { const a = V[i][j], b = V[i][(j + 1) % K]; ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
-    }
-    ctx.stroke();
-    if (p < 1) requestAnimationFrame(draw);
-  })(t0);
+    // button
+    ctx.save(); ctx.translate(btn.left + btn.width / 2, btn.top + btn.height / 2); ctx.transform(1, 0, Math.tan(12 * Math.PI / 180), 1, 0, 0);
+    ctx.fillStyle = "#000"; ctx.fillRect(-btn.width / 2 + 6, -btn.height / 2 + 6, btn.width, btn.height);
+    ctx.fillStyle = "#fff"; ctx.fillRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height);
+    ctx.lineWidth = 4; ctx.strokeStyle = "#000"; ctx.strokeRect(-btn.width / 2, -btn.height / 2, btn.width, btn.height);
+    ctx.fillStyle = "#000"; ctx.font = "italic 900 30px 'Playfair Display', serif"; ctx.fillText("ENTER \u266A", 0, 2);
+    ctx.restore();
+  }
+  function sheen() {
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, "rgba(255,255,255,.28)"); g.addColorStop(0.45, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(160,205,255,.22)");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+  function clipShard(s) { ctx.beginPath(); s.pts.forEach((p, k) => (k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); ctx.clip(); }
 
-  // phase 2: the pieces fall away
-  let longest = 0;
-  setTimeout(() => {
-    cv.style.transition = "opacity .25s"; cv.style.opacity = "0";
-    shards.forEach(({ el, cx, cy, ring }) => {
-      const dx = cx - ox, dy = cy - oy, d = Math.hypot(dx, dy) || 1;
-      const push = rnd(30, 150) * (1 + (R - ring) * 0.15);
-      const tx = (dx / d) * push + rnd(-30, 30);
-      const ty = (dy / d) * push * 0.4 + H * rnd(0.55, 1.05);
-      const rot = rnd(-260, 260);
-      const dur = rnd(900, 1500), delay = ring * 45 + rnd(0, 120);
-      longest = Math.max(longest, dur + delay);
-      el.animate([
-        { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
-        { transform: "translate(" + tx * 0.2 + "px," + ty * 0.03 + "px) rotate(" + rot * 0.12 + "deg)", opacity: 1, offset: 0.18 },
-        { transform: "translate(" + tx + "px," + ty + "px) rotate(" + rot + "deg)", opacity: 0 },
-      ], { duration: dur, delay, easing: "cubic-bezier(.45,0,.85,.55)", fill: "forwards" });
-    });
-    setTimeout(() => { box.remove(); gate.remove(); }, longest + 100);
-  }, CRACK);
-
-  // quick impact shake
-  // (not on <body>: a transform there would break position:fixed for the shards)
+  // quick impact shake on the page content (never on <body>)
   const rumble = document.querySelectorAll(".hero, .ticker, main, footer");
   rumble.forEach((n) => n.classList.add("shake"));
   setTimeout(() => rumble.forEach((n) => n.classList.remove("shake")), 300);
+
+  const CRACK = 260, t0 = performance.now(), END = 260 + 45 * R + 120 + 1500 + 80;
+  (function frame(now) {
+    const t = now - t0;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    if (t < CRACK) {                                  // phase 1: whole pane, cracks spreading
+      paintGate(); sheen();
+      const reach = (t / CRACK) * R;
+      ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = 2; ctx.beginPath();
+      for (let j = 0; j < K; j++) {
+        ctx.moveTo(ox, oy);
+        for (let i = 1; i <= R; i++) {
+          const f = Math.min(Math.max(reach - (i - 1), 0), 1); if (!f) break;
+          const a = V[i - 1][j], b = V[i][j];
+          ctx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f);
+        }
+      }
+      for (let i = 1; i < R; i++) { if (reach < i) break; for (let j = 0; j < K; j++) { const a = V[i][j], b = V[i][(j + 1) % K]; ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); } }
+      ctx.stroke();
+    } else {                                          // phase 2: pieces fall
+      for (const s of shards) {
+        const p = Math.min(Math.max((t - s.delay) / s.dur, 0), 1);
+        if (p >= 1) continue;
+        const e = p * p, alpha = 1 - Math.max(0, (p - 0.6) / 0.4);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(s.cx + s.tx * e, s.cy + s.ty * e); ctx.rotate(s.rot * e); ctx.translate(-s.cx, -s.cy);
+        clipShard(s); paintGate(); sheen();
+        ctx.restore();
+      }
+    }
+    if (t < END) requestAnimationFrame(frame); else { cv.remove(); gate.remove(); }
+  })(t0);
 }
 
 function glassSound() {
@@ -340,7 +357,7 @@ function glassSound() {
     const r = btn.getBoundingClientRect();
     const x = e && e.clientX ? e.clientX : r.left + r.width / 2, y = e && e.clientY ? e.clientY : r.top + r.height / 2;
     if (withMusic) glassSound();
-    try { shatterGate(gate, x, y, go); } catch (err) { document.querySelectorAll(".shatter").forEach((n) => n.remove()); gate.classList.remove("gone"); gate.classList.add("out"); go(); }
+    try { shatterGate(gate, x, y, go); } catch (err) { document.querySelectorAll("canvas.shatter").forEach((n) => n.remove()); gate.classList.remove("gone"); gate.classList.add("out"); go(); }
   }
   const enterBtn = document.getElementById("enter"), muteBtn = document.getElementById("enter-mute");
   enterBtn.addEventListener("click", (e) => enter(true, e, enterBtn), { once: true });
