@@ -163,7 +163,7 @@ const MUSIC = {
 // ============ glass shatter ============
 function shatterGate(gate, ox, oy, onStart) {
   const rect = gate.getBoundingClientRect(), W = rect.width, H = rect.height;
-  const K = 11, R = 4;                         // spokes, rings
+  const K = 10, R = 4;                         // spokes, rings
   const far = Math.hypot(W, H) * 1.2;
   const rnd = (a, b) => a + Math.random() * (b - a);
 
@@ -188,10 +188,20 @@ function shatterGate(gate, ox, oy, onStart) {
     const pts = [V[i][j], V[i][j2], V[i + 1][j2], V[i + 1][j]];
     const cx = pts.reduce((s, p) => s + Math.min(Math.max(p[0], 0), W), 0) / 4;
     const cy = pts.reduce((s, p) => s + Math.min(Math.max(p[1], 0), H), 0) / 4;
-    const el = gate.cloneNode(true);
-    el.classList.remove("out"); el.classList.add("shard"); // ids stay so the copy keeps the gate styling
-    el.style.clipPath = "polygon(" + pts.map((p) => p[0].toFixed(1) + "px " + p[1].toFixed(1) + "px").join(",") + ")";
-    el.style.transformOrigin = cx.toFixed(0) + "px " + cy.toFixed(0) + "px";
+    // each shard is only as big as its own bounding box (keeps phone memory low)
+    const xs = pts.map((p) => Math.min(Math.max(p[0], 0), W)), ys = pts.map((p) => Math.min(Math.max(p[1], 0), H));
+    const bx = Math.max(Math.floor(Math.min(...xs)) - 2, 0), by = Math.max(Math.floor(Math.min(...ys)) - 2, 0);
+    const bw = Math.min(Math.ceil(Math.max(...xs)) + 2, W) - bx, bh = Math.min(Math.ceil(Math.max(...ys)) + 2, H) - by;
+    if (bw <= 0 || bh <= 0) continue;
+    const el = document.createElement("div");
+    el.className = "shard";
+    el.style.cssText = "left:" + bx + "px;top:" + by + "px;width:" + bw + "px;height:" + bh + "px;" +
+      "clip-path:polygon(" + pts.map((p) => (p[0] - bx).toFixed(1) + "px " + (p[1] - by).toFixed(1) + "px").join(",") + ");" +
+      "transform-origin:" + (cx - bx).toFixed(0) + "px " + (cy - by).toFixed(0) + "px;";
+    const inner = gate.cloneNode(true);     // ids stay so the copy keeps the gate styling
+    inner.classList.remove("out");
+    inner.style.cssText = "position:absolute;inset:auto;left:" + -bx + "px;top:" + -by + "px;width:" + W + "px;height:" + H + "px;transition:none;";
+    el.append(inner);
     box.append(el); shards.push({ el, cx, cy, ring: i });
   }
   const cv = document.createElement("canvas");
@@ -248,8 +258,10 @@ function shatterGate(gate, ox, oy, onStart) {
   }, CRACK);
 
   // quick impact shake
-  document.body.classList.add("shake");
-  setTimeout(() => document.body.classList.remove("shake"), 300);
+  // (not on <body>: a transform there would break position:fixed for the shards)
+  const rumble = document.querySelectorAll(".hero, .ticker, main, footer");
+  rumble.forEach((n) => n.classList.add("shake"));
+  setTimeout(() => rumble.forEach((n) => n.classList.remove("shake")), 300);
 }
 
 function glassSound() {
@@ -328,7 +340,7 @@ function glassSound() {
     const r = btn.getBoundingClientRect();
     const x = e && e.clientX ? e.clientX : r.left + r.width / 2, y = e && e.clientY ? e.clientY : r.top + r.height / 2;
     if (withMusic) glassSound();
-    shatterGate(gate, x, y, go);
+    try { shatterGate(gate, x, y, go); } catch (err) { document.querySelectorAll(".shatter").forEach((n) => n.remove()); gate.classList.remove("gone"); gate.classList.add("out"); go(); }
   }
   const enterBtn = document.getElementById("enter"), muteBtn = document.getElementById("enter-mute");
   enterBtn.addEventListener("click", (e) => enter(true, e, enterBtn), { once: true });
