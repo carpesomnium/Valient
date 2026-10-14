@@ -14,11 +14,12 @@ const MUSIC = {
   file: "",
 };
 
-// ============ background: hologram + targeting ring + drifting dust ============
+// ============ background: chunky low-res hologram + ring + dust ============
 (function () {
   const canvas = document.getElementById("bg");
   const ctx = canvas.getContext("2d");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const PX = 3;                                   // each canvas pixel is drawn 3x3 on screen (the "downgrade")
   const p = (1 + Math.sqrt(5)) / 2;
   const verts = [[-1,p,0],[1,p,0],[-1,-p,0],[1,-p,0],[0,-1,p],[0,1,p],[0,-1,-p],[0,1,-p],[p,0,-1],[p,0,1],[-p,0,-1],[-p,0,1]];
   const edges = [];
@@ -28,30 +29,30 @@ const MUSIC = {
       if (Math.abs(d - 2) < 0.01) edges.push([i, j]);
     }
 
-  let w, h, dpr, dust = [];
+  let w, h, dust = [];
   function resize() {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    w = canvas.width = canvas.clientWidth * dpr;
-    h = canvas.height = canvas.clientHeight * dpr;
-    dust = Array.from({ length: Math.round(canvas.clientWidth / 18) }, () => ({
-      x: Math.random() * w, y: Math.random() * h,
-      s: (0.8 + Math.random() * 1.4) * dpr, v: (0.1 + Math.random() * 0.4) * dpr,
-      c: Math.random() < 0.2 ? "255,138,31" : "140,200,230", a: 0.25 + Math.random() * 0.4,
+    w = canvas.width = Math.ceil(canvas.clientWidth / PX);
+    h = canvas.height = Math.ceil(canvas.clientHeight / PX);
+    dust = Array.from({ length: Math.round(w / 6) }, () => ({
+      x: Math.random() * w, y: Math.random() * h, v: 0.05 + Math.random() * 0.2,
+      c: Math.random() < 0.2 ? "224,128,31" : "150,190,205", a: 0.25 + Math.random() * 0.4,
     }));
   }
   addEventListener("resize", resize);
   resize();
 
+  let last = 0;
   function frame(t) {
+    requestAnimationFrame(frame);
+    if (t - last < 66) return;                    // ~15fps: choppy on purpose
+    last = t;
     ctx.clearRect(0, 0, w, h);
     for (const s of dust) {
-      s.y -= s.v;
-      if (s.y < -4) { s.y = h + 4; s.x = Math.random() * w; }
-      ctx.fillStyle = `rgba(${s.c},${s.a})`;
-      ctx.fillRect(s.x, s.y, s.s, s.s);
+      s.y -= s.v; if (s.y < -2) { s.y = h + 2; s.x = Math.random() * w; }
+      ctx.fillStyle = `rgba(${s.c},${s.a})`; ctx.fillRect(s.x | 0, s.y | 0, 1, 1);
     }
     const a = t / 5200, b = t / 8200;
-    const size = Math.min(w, h) * (w > h ? 0.3 : 0.24);
+    const size = Math.min(w, h) * (w > h ? 0.3 : 0.26);
     const cx = w * (w > h ? 0.74 : 0.68), cy = h * (w > h ? 0.46 : 0.64);
     const pts = verts.map(([x, y, z]) => {
       const x1 = x * Math.cos(a) + z * Math.sin(a), z1 = -x * Math.sin(a) + z * Math.cos(a);
@@ -59,33 +60,26 @@ const MUSIC = {
       const k = 1 / (1 - z2 / 6);
       return [cx + x1 * size * 0.5 * k, cy + y1 * size * 0.5 * k];
     });
-
-    // hologram wireframe
-    ctx.lineWidth = 1.4 * dpr;
-    const al = w > h ? 0.6 : 0.3;
-    ctx.strokeStyle = `rgba(95,208,255,${al})`;
-    ctx.shadowColor = "#5fd0ff"; ctx.shadowBlur = 8 * dpr;
+    const al = w > h ? 0.55 : 0.3;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(134,201,220,${al})`;
     ctx.beginPath();
-    for (const [i, j] of edges) { ctx.moveTo(...pts[i]); ctx.lineTo(...pts[j]); }
+    for (const [i, j] of edges) { ctx.moveTo(pts[i][0], pts[i][1]); ctx.lineTo(pts[j][0], pts[j][1]); }
     ctx.stroke();
-    ctx.shadowBlur = 0;
 
-    // targeting ring
     const rad = size * 0.62;
     ctx.save();
     ctx.translate(cx, cy); ctx.rotate(t / 9000);
-    ctx.strokeStyle = `rgba(255,138,31,${al})`; ctx.lineWidth = 1.2 * dpr;
-    ctx.setLineDash([8 * dpr, 10 * dpr]);
+    ctx.strokeStyle = `rgba(224,128,31,${al})`;
+    ctx.setLineDash([3, 4]);
     ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.beginPath();
-    for (let k = 0; k < 4; k++) { ctx.moveTo(rad - 10 * dpr, 0); ctx.lineTo(rad + 12 * dpr, 0); ctx.rotate(Math.PI / 2); }
+    for (let k = 0; k < 4; k++) { ctx.moveTo(rad - 3, 0); ctx.lineTo(rad + 4, 0); ctx.rotate(Math.PI / 2); }
     ctx.stroke();
     ctx.restore();
-
-    if (!reduce) requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  if (reduce) { last = -1e9; frame(0); } else requestAnimationFrame(frame);
 })();
 
 // ============ terminal menu ============
@@ -117,6 +111,93 @@ const MUSIC = {
     }
   }, { rootMargin: "-40% 0px -55% 0px" });
   document.querySelectorAll("main section").forEach((s) => io.observe(s));
+})();
+
+// ============ messy page stack (3D models) ============
+(function () {
+  const stack = document.getElementById("stack");
+  if (!stack) return;
+  const cards = [...stack.querySelectorAll(".card")];
+  const count = document.getElementById("count"), hint = document.getElementById("hint");
+  let seed = 11; const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  cards.forEach((c, i) => {
+    c.dataset.n = i + 1;
+    c.style.setProperty("--rot", ((rand() - 0.5) * 7).toFixed(2) + "deg");
+    c.style.setProperty("--tape", ((rand() - 0.5) * 12).toFixed(1) + "deg");
+  });
+  let order = cards.slice(), busy = false;
+  const pad = (n) => String(n).padStart(2, "0");
+  const hideHint = () => { hint.hidden = true; };
+
+  function render() {
+    order.forEach((c, pos) => {
+      c.style.setProperty("--p", pos);
+      c.classList.toggle("top", pos === 0);
+      c.classList.toggle("deep", pos > 3);
+      c.inert = pos !== 0;
+    });
+    count.textContent = pad(order[0].dataset.n) + " / " + pad(cards.length);
+  }
+  render();
+
+  function next(dir) {                              // top page flies off, lands at the back
+    if (busy) return; busy = true; hideHint();
+    const c = order[0];
+    c.style.transition = "transform .32s cubic-bezier(.5,0,.9,.6), opacity .32s";
+    c.style.transform = `translate(${dir * 130}%, 30px) rotate(${dir * 28}deg)`;
+    c.style.opacity = "0";
+    setTimeout(() => {
+      c.style.transition = "none"; c.style.transform = ""; c.style.opacity = "";
+      order.push(order.shift()); render();
+      void c.offsetWidth; c.style.transition = ""; busy = false;
+    }, 330);
+  }
+  function prev() {                                 // last page slides back in on top
+    if (busy) return; busy = true; hideHint();
+    const c = order[order.length - 1];
+    c.style.transition = "none"; c.style.transform = "translate(-130%, 30px) rotate(-28deg)"; c.style.opacity = "0";
+    order.unshift(order.pop()); render();
+    void c.offsetWidth;
+    c.style.transition = "transform .4s cubic-bezier(.2,.9,.3,1), opacity .25s"; c.style.transform = ""; c.style.opacity = "";
+    setTimeout(() => { c.style.transition = ""; busy = false; }, 420);
+  }
+  document.getElementById("next").addEventListener("click", () => next(-1));
+  document.getElementById("prev").addEventListener("click", prev);
+  stack.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); next(-1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); prev(); }
+  });
+
+  // drag the top page: flick it away to see the next one
+  let active = false, drag = false, pid = null, sx = 0, sy = 0, st = 0, suppress = false;
+  stack.addEventListener("pointerdown", (e) => {
+    if (busy || !e.isPrimary || !order[0].contains(e.target)) return;
+    active = true; drag = false; suppress = false; pid = e.pointerId; sx = e.clientX; sy = e.clientY; st = e.timeStamp;
+  });
+  stack.addEventListener("pointermove", (e) => {
+    if (!active || e.pointerId !== pid) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!drag) {
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+        drag = true; try { stack.setPointerCapture(pid); } catch (err) {}
+        order[0].style.transition = "none"; hideHint();
+      } else return;
+    }
+    order[0].style.transform = `translate(${dx}px, ${dy * 0.15}px) rotate(${dx * 0.06}deg)`;
+  });
+  function release(e, cancelled) {
+    if (!active || e.pointerId !== pid) return;
+    active = false;
+    if (!drag) return;
+    suppress = true;                                // a drag shouldn't count as a tap on the link
+    const top = order[0], dx = e.clientX - sx, v = Math.abs(dx) / Math.max(e.timeStamp - st, 1);
+    top.style.transition = "";
+    if (!cancelled && (Math.abs(dx) > 80 || v > 0.5)) next(dx < 0 ? -1 : 1);
+    else top.style.transform = "";
+  }
+  stack.addEventListener("pointerup", (e) => release(e, false));
+  stack.addEventListener("pointercancel", (e) => release(e, true));
+  stack.addEventListener("click", (e) => { if (suppress) { e.preventDefault(); e.stopPropagation(); suppress = false; } }, true);
 })();
 
 // ============ scroll reveal ============
@@ -216,6 +297,7 @@ const MUSIC = {
     ["Establishing uplink", "OK"],
     ["Reading citizen file", "NES"],
     ["Employment status", "OPEN TO WORK"],
+    ["Signal quality", "DEGRADED"],
     ["Portfolio records", models + " MODELS"],
     ["Clearance", "GRANTED"],
   ];
@@ -239,7 +321,7 @@ const MUSIC = {
       ld.className = "ld"; st.className = "st";
       ln.append(lb, ld, st); log.append(ln);
       for (const ch of LINES[i][0]) { lb.textContent += ch; await wait(16); }
-      st.textContent = LINES[i][1]; ln.classList.add("done");
+      st.textContent = LINES[i][1]; ln.classList.add("done"); if (LINES[i][1] === "DEGRADED") st.classList.add("bad");
       beep(520 + i * 110, 0.06);
       bar.style.width = ((i + 1) / LINES.length) * 100 + "%";
       await wait(230);

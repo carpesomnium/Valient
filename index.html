@@ -18,8 +18,8 @@
   <meta name="twitter:image" content="https://carpesomnium.github.io/Valient/og.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Stardos+Stencil:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=14">
   <noscript><style>#gate{display:none}</style></noscript>
 </head>
 <body>
@@ -41,8 +41,10 @@
   <!-- background -->
   <div class="bg" aria-hidden="true"><canvas id="bg"></canvas></div>
   <div class="fx grid" aria-hidden="true"></div>
-  <div class="fx scanbar" aria-hidden="true"></div>
+  <div class="fx noise" aria-hidden="true"></div>
   <div class="fx scan" aria-hidden="true"></div>
+  <div class="fx tear" aria-hidden="true"></div>
+  <div class="fx tear b" aria-hidden="true"></div>
   <div class="fx vig" aria-hidden="true"></div>
 
   <header class="hero" id="top">
@@ -98,44 +100,52 @@
 
     <section id="models" class="reveal">
       <h2><em>File 02</em>3D Models</h2>
-      <div class="grid-cards">
-        <article class="card">
-          <a class="thumb pic" href="images/rifle.jpg" target="_blank" rel="noopener" aria-label="Open the AR-10 model image full size">
-            <img src="images/rifle.jpg" width="538" height="562" loading="lazy" alt="Two views of the AR-10, a grey hard-surface rifle 3D model with the NES watermark">
-          </a>
-          <h3>AR-10</h3>
-          <p>Hard-surface rifle model, shown from two angles.</p>
-          <a href="images/rifle.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-        </article>
-        <article class="card">
-          <a class="thumb pic" href="images/overture.jpg" target="_blank" rel="noopener" aria-label="Open the Overture model image full size">
-            <img src="images/overture.jpg" width="1400" height="787" loading="lazy" alt="The Overture, a black and silver revolver 3D model from Cyberpunk, with the NES watermark">
-          </a>
-          <h3>Overture</h3>
-          <p>Revolver from Cyberpunk.</p>
-          <a href="images/overture.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-        </article>
-        <article class="card">
-          <a class="thumb pic" href="images/hawk.jpg" target="_blank" rel="noopener" aria-label="Open the Hawk model image full size">
-            <img src="images/hawk.jpg" width="1280" height="720" loading="lazy" alt="The Hawk, a silver and orange compact rifle 3D model from Cyberpunk, with the NES watermark">
-          </a>
-          <h3>Hawk</h3>
-          <p>Weapon from Cyberpunk.</p>
-          <a href="images/hawk.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-        </article>
-        <article class="card">
-          <a class="thumb pic" href="images/sentry.jpg" target="_blank" rel="noopener" aria-label="Open the Sentry model image full size">
-            <img src="images/sentry.jpg" width="1400" height="787" loading="lazy" alt="The Sentry, a grey mounted gun turret 3D model with the NES watermark">
-          </a>
-          <h3>Sentry</h3>
-          <p>Mounted turret.</p>
-          <a href="images/sentry.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-        </article>
-        <article class="card soon">
-          <div class="thumb"><span>Pending</span></div>
-          <h3>More coming</h3>
-          <p>New models are on the way.</p>
-        </article>
+      <div class="stack-wrap">
+        <div class="stack" id="stack" tabindex="0" role="group" aria-roledescription="carousel" aria-label="3D models. Swipe the top page, or use the arrows.">
+          <article class="card">
+            <a class="thumb pic" href="images/rifle.jpg" target="_blank" rel="noopener" aria-label="Open the AR-10 model image full size">
+              <img src="images/rifle.jpg" width="538" height="562" loading="lazy" alt="Two views of the AR-10, a grey hard-surface rifle 3D model with the NES watermark">
+            </a>
+            <h3>AR-10</h3>
+            <p>Hard-surface rifle model, shown from two angles.</p>
+            <a href="images/rifle.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
+          </article>
+          <article class="card">
+            <a class="thumb pic" href="images/overture.jpg" target="_blank" rel="noopener" aria-label="Open the Overture model image full size">
+              <img src="images/overture.jpg" width="1400" height="787" loading="lazy" alt="The Overture, a black and silver revolver 3D model from Cyberpunk, with the NES watermark">
+            </a>
+            <h3>Overture</h3>
+            <p>Revolver from Cyberpunk.</p>
+            <a href="images/overture.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
+          </article>
+          <article class="card">
+            <a class="thumb pic" href="images/hawk.jpg" target="_blank" rel="noopener" aria-label="Open the Hawk model image full size">
+              <img src="images/hawk.jpg" width="1280" height="720" loading="lazy" alt="The Hawk, a silver and orange compact rifle 3D model from Cyberpunk, with the NES watermark">
+            </a>
+            <h3>Hawk</h3>
+            <p>Weapon from Cyberpunk.</p>
+            <a href="images/hawk.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
+          </article>
+          <article class="card">
+            <a class="thumb pic" href="images/sentry.jpg" target="_blank" rel="noopener" aria-label="Open the Sentry model image full size">
+              <img src="images/sentry.jpg" width="1400" height="787" loading="lazy" alt="The Sentry, a grey mounted gun turret 3D model with the NES watermark">
+            </a>
+            <h3>Sentry</h3>
+            <p>Mounted turret.</p>
+            <a href="images/sentry.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
+          </article>
+          <article class="card soon">
+            <div class="thumb"><span>Pending</span></div>
+            <h3>More coming</h3>
+            <p>New models are on the way.</p>
+          </article>
+        </div>
+        <div class="stack-ui">
+          <button type="button" class="sbtn" id="prev" aria-label="Previous model">&larr;</button>
+          <span class="count" id="count" aria-live="polite">01 / 05</span>
+          <button type="button" class="sbtn" id="next" aria-label="Next model">&rarr;</button>
+          <span class="hint" id="hint">&larr; swipe the pages</span>
+        </div>
       </div>
     </section>
 
@@ -191,6 +201,6 @@
     <p class="p-note" id="p-note" hidden></p>
   </aside>
 
-  <script src="script.js?v=13"></script>
+  <script src="script.js?v=14"></script>
 </body>
 </html>
