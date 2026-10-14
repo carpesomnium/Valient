@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>My Portfolio! // nes</title>
   <meta name="description" content="Portfolio of nes: full stack Luau programmer for Roblox, open to work.">
-  <meta name="theme-color" content="#060f2b">
+  <meta name="theme-color" content="#090e13">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="canonical" href="https://carpesomnium.github.io/Valient/">
@@ -18,76 +18,71 @@
   <meta name="twitter:image" content="https://carpesomnium.github.io/Valient/og.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=13">
   <noscript><style>#gate{display:none}</style></noscript>
 </head>
 <body>
-  <!-- entry gate: the tap also unlocks audio -->
+  <!-- uplink terminal: the first tap also unlocks audio -->
   <div id="gate">
-    <div class="gate-inner">
-      <p class="mono">// press start</p>
-      <h1 class="gate-logo" aria-label="My Portfolio!"><span class="l1" data-r>MY</span><span class="l2" data-r>PORTFOLIO!</span></h1>
-      <button id="enter" type="button"><span>Enter &#9834;</span></button>
-      <button id="enter-mute" type="button" class="quiet">enter without music</button>
+    <div class="boot">
+      <p class="boot-tag">// overwatch uplink terminal</p>
+      <h1 aria-label="My Portfolio!">MY PORTFOLIO!</h1>
+      <div id="boot-log" aria-live="polite"></div>
+      <div class="pbar" aria-hidden="true"><i id="boot-bar"></i></div>
+      <p class="granted" id="granted" aria-hidden="true">ACCESS GRANTED</p>
+      <div id="boot-actions">
+        <button id="enter" type="button"><span>Begin uplink &#9834;</span></button>
+        <button id="enter-mute" type="button" class="quiet">begin without audio</button>
+      </div>
     </div>
   </div>
 
   <!-- background -->
-  <div class="bg" aria-hidden="true">
-    <svg class="splash" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
-          <feTurbulence type="fractalNoise" baseFrequency=".015 .045" numOctaves="4" seed="7" result="n"/>
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="70"/>
-        </filter>
-      </defs>
-      <g filter="url(#rough)" fill="#3f86ff">
-        <polygon points="-80,90 520,10 690,230 500,330 -80,400"/>
-        <rect x="120" y="300" width="14" height="120" rx="7"/>
-        <rect x="300" y="310" width="10" height="80" rx="5"/>
-        <rect x="430" y="300" width="12" height="150" rx="6"/>
-        <circle cx="620" cy="90" r="34"/>
-        <circle cx="700" cy="330" r="16"/>
-        <circle cx="90" cy="500" r="22"/>
-      </g>
-    </svg>
-    <canvas id="bg"></canvas>
-  </div>
-  <div class="grain" aria-hidden="true"></div>
+  <div class="bg" aria-hidden="true"><canvas id="bg"></canvas></div>
+  <div class="fx grid" aria-hidden="true"></div>
+  <div class="fx scanbar" aria-hidden="true"></div>
+  <div class="fx scan" aria-hidden="true"></div>
+  <div class="fx vig" aria-hidden="true"></div>
 
   <header class="hero" id="top">
-    <p class="mono tag">// i love the world and everything in it</p>
-    <h1 class="logo" aria-label="My Portfolio!"><span class="l1" data-r>MY</span><span class="l2" data-r>PORTFOLIO!</span></h1>
+    <div class="hud-top" aria-hidden="true">
+      <span class="live">Uplink <b>established</b></span>
+      <span>File: <b>nes</b></span>
+    </div>
+
+    <p class="tag">// citizen file: open to work</p>
+    <h1 class="logo" aria-label="My Portfolio!">MY PORTFOLIO!</h1>
+    <p class="subtitle">Full stack Luau programmer &middot; 3D modeler</p>
 
     <div class="numeral" id="numeral" aria-hidden="true">01</div>
 
     <nav class="menu" id="menu" aria-label="Main">
-      <a href="#about"><span class="lbl" data-r="soft">About</span><small>who am i?</small></a>
-      <a href="#models"><span class="lbl" data-r="soft">3D Models</span><small>my work</small></a>
-      <a href="#hire"><span class="lbl" data-r="soft">Hire Me</span><small>open to work</small></a>
-      <a href="#contact"><span class="lbl" data-r="soft">Contact</span><small>say hello</small></a>
-      <a href="https://github.com/carpesomnium" target="_blank" rel="noopener"><span class="lbl" data-r="soft">GitHub</span><small>carpesomnium</small></a>
-      <a href="#contact" data-copy="kerosionn" class="copy"><span class="lbl" data-r="soft">Discord</span><small>tap to copy @kerosionn</small></a>
+      <a href="#about"><i>01</i><span>About</span><small>who am i?</small></a>
+      <a href="#models"><i>02</i><span>3D Models</span><small>my work</small></a>
+      <a href="#hire"><i>03</i><span>Hire Me</span><small>open to work</small></a>
+      <a href="#contact"><i>04</i><span>Contact</span><small>say hello</small></a>
+      <a href="https://github.com/carpesomnium" target="_blank" rel="noopener"><i>05</i><span>GitHub</span><small>carpesomnium</small></a>
+      <a href="#contact" data-copy="kerosionn" class="copy"><i>06</i><span>Discord</span><small>tap to copy @kerosionn</small></a>
     </nav>
 
     <div class="bars" aria-hidden="true">
-      <div class="bar"><small>ALIAS</small><b>nes</b></div>
-      <div class="bar"><small>STATUS</small><b>Open to work</b></div>
+      <div class="readout"><small>Alias</small><b>nes</b></div>
+      <div class="readout warn"><small>Status</small><b>Open to work</b></div>
     </div>
   </header>
 
   <div class="ticker" aria-hidden="true">
     <div class="track">
-      <span>I LOVE THE WORLD AND EVERYTHING IN IT &#9733; MODEL &#9733; SCRIPT &#9733; BUILD &#9733; </span>
-      <span>I LOVE THE WORLD AND EVERYTHING IN IT &#9733; MODEL &#9733; SCRIPT &#9733; BUILD &#9733; </span>
-      <span>I LOVE THE WORLD AND EVERYTHING IN IT &#9733; MODEL &#9733; SCRIPT &#9733; BUILD &#9733; </span>
+      <span>CITIZEN FILE: NES &#9632; UTILITY: LUAU &#9632; UTILITY: 3D MODELING &#9632; STATUS: OPEN TO WORK &#9632; </span>
+      <span>CITIZEN FILE: NES &#9632; UTILITY: LUAU &#9632; UTILITY: 3D MODELING &#9632; STATUS: OPEN TO WORK &#9632; </span>
+      <span>CITIZEN FILE: NES &#9632; UTILITY: LUAU &#9632; UTILITY: 3D MODELING &#9632; STATUS: OPEN TO WORK &#9632; </span>
     </div>
   </div>
 
   <main>
     <section id="about" class="reveal">
-      <h2 data-r><em>01</em>About</h2>
+      <h2><em>File 01</em>About</h2>
       <div class="panel">
         <p class="open"><i></i>Open to work</p>
         <p>Hey, my name is <b>nes</b>, I&rsquo;ve been doing roblox game development for about 2 years now on and off. More specifically programming, I am a professional and proficient full stack luau programmer and can ship out stuff you need fast.</p>
@@ -102,8 +97,8 @@
     </section>
 
     <section id="models" class="reveal">
-      <h2 data-r><em>02</em>3D Models</h2>
-      <div class="grid">
+      <h2><em>File 02</em>3D Models</h2>
+      <div class="grid-cards">
         <article class="card">
           <a class="thumb pic" href="images/rifle.jpg" target="_blank" rel="noopener" aria-label="Open the AR-10 model image full size">
             <img src="images/rifle.jpg" width="538" height="562" loading="lazy" alt="Two views of the AR-10, a grey hard-surface rifle 3D model with the NES watermark">
@@ -137,7 +132,7 @@
           <a href="images/sentry.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
         </article>
         <article class="card soon">
-          <div class="thumb"><span>SOON</span></div>
+          <div class="thumb"><span>Pending</span></div>
           <h3>More coming</h3>
           <p>New models are on the way.</p>
         </article>
@@ -145,7 +140,7 @@
     </section>
 
     <section id="hire" class="reveal">
-      <h2 data-r><em>03</em>Hire Me</h2>
+      <h2><em>File 03</em>Hire Me</h2>
       <div class="panel">
         <p class="open"><i></i>Open to work</p>
         <p>Looking for a scripter for your Roblox game? I work with teams and small groups, and I ship fast.</p>
@@ -167,7 +162,7 @@
     </section>
 
     <section id="contact" class="reveal">
-      <h2 data-r><em>04</em>Contact</h2>
+      <h2><em>File 04</em>Contact</h2>
       <p class="lead">Open to teams and small groups. Reach me on Discord or GitHub.</p>
       <div class="links">
         <a class="big" href="https://github.com/carpesomnium" target="_blank" rel="noopener">
@@ -181,7 +176,7 @@
   </main>
 
   <footer>
-    <span>MY PORTFOLIO! // nes</span>
+    <span>MY PORTFOLIO! // NES // END OF FILE</span>
     <a href="#top">back to top &uarr;</a>
   </footer>
 
@@ -189,13 +184,13 @@
   <aside id="player" class="player" aria-label="Music player">
     <div class="p-head">
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="p-title">Color Your Night</span>
+      <span class="p-title">CP Violation</span>
       <button id="p-toggle" type="button" aria-label="Minimize music player">&times;</button>
     </div>
     <div class="p-body"><div id="yt"></div></div>
     <p class="p-note" id="p-note" hidden></p>
   </aside>
 
-  <script src="script.js?v=12"></script>
+  <script src="script.js?v=13"></script>
 </body>
 </html>
