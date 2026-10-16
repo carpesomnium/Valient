@@ -14,12 +14,11 @@ const MUSIC = {
   file: "",
 };
 
-// ============ background: chunky low-res hologram + ring + dust ============
+// ============ background: slow gold wireframe + drifting dust ============
 (function () {
   const canvas = document.getElementById("bg");
   const ctx = canvas.getContext("2d");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const PX = 3;                                   // each canvas pixel is drawn 3x3 on screen (the "downgrade")
   const p = (1 + Math.sqrt(5)) / 2;
   const verts = [[-1,p,0],[1,p,0],[-1,-p,0],[1,-p,0],[0,-1,p],[0,1,p],[0,-1,-p],[0,1,-p],[p,0,-1],[p,0,1],[-p,0,-1],[-p,0,1]];
   const edges = [];
@@ -29,57 +28,49 @@ const MUSIC = {
       if (Math.abs(d - 2) < 0.01) edges.push([i, j]);
     }
 
-  let w, h, dust = [];
+  let w, h, dpr, dust = [];
   function resize() {
-    w = canvas.width = Math.ceil(canvas.clientWidth / PX);
-    h = canvas.height = Math.ceil(canvas.clientHeight / PX);
-    dust = Array.from({ length: Math.round(w / 6) }, () => ({
-      x: Math.random() * w, y: Math.random() * h, v: 0.05 + Math.random() * 0.2,
-      c: Math.random() < 0.2 ? "224,128,31" : "150,190,205", a: 0.25 + Math.random() * 0.4,
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = canvas.width = canvas.clientWidth * dpr;
+    h = canvas.height = canvas.clientHeight * dpr;
+    dust = Array.from({ length: Math.round(canvas.clientWidth / 16) }, () => ({
+      x: Math.random() * w, y: Math.random() * h, r: (0.4 + Math.random() * 1) * dpr,
+      v: (0.08 + Math.random() * 0.25) * dpr, a: 0.12 + Math.random() * 0.35,
     }));
   }
   addEventListener("resize", resize);
   resize();
 
-  let last = 0;
   function frame(t) {
-    requestAnimationFrame(frame);
-    if (t - last < 66) return;                    // ~15fps: choppy on purpose
-    last = t;
     ctx.clearRect(0, 0, w, h);
     for (const s of dust) {
-      s.y -= s.v; if (s.y < -2) { s.y = h + 2; s.x = Math.random() * w; }
-      ctx.fillStyle = `rgba(${s.c},${s.a})`; ctx.fillRect(s.x | 0, s.y | 0, 1, 1);
+      s.y -= s.v; if (s.y < -4) { s.y = h + 4; s.x = Math.random() * w; }
+      ctx.fillStyle = `rgba(240,220,174,${s.a})`;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
     }
-    const a = t / 5200, b = t / 8200;
+    const a = t / 9000, b = t / 14000;
     const size = Math.min(w, h) * (w > h ? 0.3 : 0.26);
-    const cx = w * (w > h ? 0.74 : 0.68), cy = h * (w > h ? 0.46 : 0.64);
+    const cx = w * (w > h ? 0.74 : 0.7), cy = h * (w > h ? 0.46 : 0.64);
     const pts = verts.map(([x, y, z]) => {
       const x1 = x * Math.cos(a) + z * Math.sin(a), z1 = -x * Math.sin(a) + z * Math.cos(a);
       const y1 = y * Math.cos(b) - z1 * Math.sin(b), z2 = y * Math.sin(b) + z1 * Math.cos(b);
       const k = 1 / (1 - z2 / 6);
       return [cx + x1 * size * 0.5 * k, cy + y1 * size * 0.5 * k];
     });
-    const al = w > h ? 0.55 : 0.3;
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = `rgba(134,201,220,${al})`;
+    const al = w > h ? 0.4 : 0.22;
+    ctx.lineWidth = 1 * dpr;
+    ctx.strokeStyle = `rgba(201,169,106,${al})`;
     ctx.beginPath();
     for (const [i, j] of edges) { ctx.moveTo(pts[i][0], pts[i][1]); ctx.lineTo(pts[j][0], pts[j][1]); }
     ctx.stroke();
+    ctx.fillStyle = `rgba(240,220,174,${al + 0.15})`;
+    for (const q of pts) { ctx.beginPath(); ctx.arc(q[0], q[1], 1.6 * dpr, 0, Math.PI * 2); ctx.fill(); }
+    ctx.strokeStyle = `rgba(201,169,106,${al * 0.7})`;
+    ctx.beginPath(); ctx.arc(cx, cy, size * 0.64, 0, Math.PI * 2); ctx.stroke();
 
-    const rad = size * 0.62;
-    ctx.save();
-    ctx.translate(cx, cy); ctx.rotate(t / 9000);
-    ctx.strokeStyle = `rgba(224,128,31,${al})`;
-    ctx.setLineDash([3, 4]);
-    ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    for (let k = 0; k < 4; k++) { ctx.moveTo(rad - 3, 0); ctx.lineTo(rad + 4, 0); ctx.rotate(Math.PI / 2); }
-    ctx.stroke();
-    ctx.restore();
+    if (!reduce) requestAnimationFrame(frame);
   }
-  if (reduce) { last = -1e9; frame(0); } else requestAnimationFrame(frame);
+  requestAnimationFrame(frame);
 })();
 
 // ============ terminal menu ============
@@ -294,12 +285,11 @@ const MUSIC = {
   // ----- boot sequence -----
   const models = document.querySelectorAll("#models .card:not(.soon)").length;
   const LINES = [
-    ["Establishing uplink", "OK"],
-    ["Reading citizen file", "NES"],
-    ["Employment status", "OPEN TO WORK"],
-    ["Signal quality", "DEGRADED"],
-    ["Portfolio records", models + " MODELS"],
-    ["Clearance", "GRANTED"],
+    ["Opening the archive", "OK"],
+    ["Reading the file", "NES"],
+    ["Availability", "OPEN TO WORK"],
+    ["Pieces on file", models + " MODELS"],
+    ["Access", "GRANTED"],
   ];
   let running = false, skip = false, startedAt = 0, finished = false;
   const wait = (ms) => new Promise((r) => setTimeout(r, skip || calm ? 0 : ms));
@@ -321,10 +311,10 @@ const MUSIC = {
       ld.className = "ld"; st.className = "st";
       ln.append(lb, ld, st); log.append(ln);
       for (const ch of LINES[i][0]) { lb.textContent += ch; await wait(16); }
-      st.textContent = LINES[i][1]; ln.classList.add("done"); if (LINES[i][1] === "DEGRADED") st.classList.add("bad");
+      st.textContent = LINES[i][1]; ln.classList.add("done"); 
       beep(520 + i * 110, 0.06);
       bar.style.width = ((i + 1) / LINES.length) * 100 + "%";
-      await wait(230);
+      await wait(260);
     }
     granted.classList.add("show");
     beep(880, 0.09); setTimeout(() => beep(1175, 0.14), 110);
