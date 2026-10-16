@@ -5,29 +5,22 @@ if (location.hash && !document.getElementById(decodeURIComponent(location.hash.s
   history.replaceState(null, "", location.pathname + location.search);
 }
 
+const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+
 // ============ settings ============
 // Song for the background music. Set `youtube` to a video ID (the part after
 // "v=" in a YouTube link), or drop your own audio file in the repo and set
 // `file` to its path (e.g. "audio/song.mp3"). `file` wins if set.
 const MUSIC = {
-  youtube: "nD8h3H3w338",
+  youtube: "_E8jVPUfOD4",
   file: "",
 };
 
-// ============ background: slow gold wireframe + drifting dust ============
+// ============ background: slow gold astrolabe + drifting dust ============
 (function () {
   const canvas = document.getElementById("bg");
   const ctx = canvas.getContext("2d");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const p = (1 + Math.sqrt(5)) / 2;
-  const verts = [[-1,p,0],[1,p,0],[-1,-p,0],[1,-p,0],[0,-1,p],[0,1,p],[0,-1,-p],[0,1,-p],[p,0,-1],[p,0,1],[-p,0,-1],[-p,0,1]];
-  const edges = [];
-  for (let i = 0; i < verts.length; i++)
-    for (let j = i + 1; j < verts.length; j++) {
-      const d = Math.hypot(...verts[i].map((v, k) => v - verts[j][k]));
-      if (Math.abs(d - 2) < 0.01) edges.push([i, j]);
-    }
-
   let w, h, dpr, dust = [];
   function resize() {
     dpr = Math.min(devicePixelRatio || 1, 2);
@@ -41,6 +34,15 @@ const MUSIC = {
   addEventListener("resize", resize);
   resize();
 
+  function star(r, n, step, rot) {                // {n/step} star polygon
+    ctx.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const a = rot + ((k * step) % n) * (Math.PI * 2 / n);
+      const x = Math.cos(a) * r, y = Math.sin(a) * r;
+      k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+  }
   function frame(t) {
     ctx.clearRect(0, 0, w, h);
     for (const s of dust) {
@@ -48,26 +50,29 @@ const MUSIC = {
       ctx.fillStyle = `rgba(240,220,174,${s.a})`;
       ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
     }
-    const a = t / 9000, b = t / 14000;
-    const size = Math.min(w, h) * (w > h ? 0.3 : 0.26);
-    const cx = w * (w > h ? 0.74 : 0.7), cy = h * (w > h ? 0.46 : 0.64);
-    const pts = verts.map(([x, y, z]) => {
-      const x1 = x * Math.cos(a) + z * Math.sin(a), z1 = -x * Math.sin(a) + z * Math.cos(a);
-      const y1 = y * Math.cos(b) - z1 * Math.sin(b), z2 = y * Math.sin(b) + z1 * Math.cos(b);
-      const k = 1 / (1 - z2 / 6);
-      return [cx + x1 * size * 0.5 * k, cy + y1 * size * 0.5 * k];
-    });
-    const al = w > h ? 0.4 : 0.22;
+    const R = Math.min(w, h) * (w > h ? 0.3 : 0.27);
+    const cx = w * (w > h ? 0.74 : 0.7), cy = h * (w > h ? 0.48 : 0.66);
+    const al = w > h ? 0.42 : 0.24;
+    ctx.save(); ctx.translate(cx, cy);
     ctx.lineWidth = 1 * dpr;
     ctx.strokeStyle = `rgba(201,169,106,${al})`;
+    for (const f of [1, 0.9, 0.55]) { ctx.beginPath(); ctx.arc(0, 0, R * f, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.save(); ctx.rotate(t / 26000);            // tick ring
     ctx.beginPath();
-    for (const [i, j] of edges) { ctx.moveTo(pts[i][0], pts[i][1]); ctx.lineTo(pts[j][0], pts[j][1]); }
-    ctx.stroke();
-    ctx.fillStyle = `rgba(240,220,174,${al + 0.15})`;
-    for (const q of pts) { ctx.beginPath(); ctx.arc(q[0], q[1], 1.6 * dpr, 0, Math.PI * 2); ctx.fill(); }
-    ctx.strokeStyle = `rgba(201,169,106,${al * 0.7})`;
-    ctx.beginPath(); ctx.arc(cx, cy, size * 0.64, 0, Math.PI * 2); ctx.stroke();
-
+    for (let k = 0; k < 72; k++) {
+      const a = k * Math.PI / 36, len = k % 6 === 0 ? 0.1 : 0.04;
+      ctx.moveTo(Math.cos(a) * R * 0.9, Math.sin(a) * R * 0.9);
+      ctx.lineTo(Math.cos(a) * R * (0.9 + len), Math.sin(a) * R * (0.9 + len));
+    }
+    ctx.stroke(); ctx.restore();
+    star(R * 0.9, 8, 3, t / 18000);               // two counter-turning eight-point stars
+    star(R * 0.55, 8, 3, -t / 14000);
+    ctx.fillStyle = `rgba(240,220,174,${al + 0.2})`;
+    for (let k = 0; k < 8; k++) {
+      const a = k * Math.PI / 4 + t / 18000;
+      ctx.beginPath(); ctx.arc(Math.cos(a) * R * 0.9, Math.sin(a) * R * 0.9, 2 * dpr, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
     if (!reduce) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -83,7 +88,7 @@ const MUSIC = {
     if (i === active) return;
     active = i;
     links.forEach((l, k) => l.classList.toggle("on", k === i));
-    numeral.textContent = String(i + 1).padStart(2, "0");
+    numeral.textContent = ROMAN[i + 1];
     numeral.classList.remove("pop"); void numeral.offsetWidth; numeral.classList.add("pop");
   }
   links.forEach((l, i) => {
@@ -127,7 +132,7 @@ const MUSIC = {
       c.classList.toggle("deep", pos > 3);
       c.inert = pos !== 0;
     });
-    count.textContent = pad(order[0].dataset.n) + " / " + pad(cards.length);
+    count.textContent = ROMAN[+order[0].dataset.n] + " / " + ROMAN[cards.length];
   }
   render();
 
@@ -285,11 +290,11 @@ const MUSIC = {
   // ----- boot sequence -----
   const models = document.querySelectorAll("#models .card:not(.soon)").length;
   const LINES = [
-    ["Opening the archive", "OK"],
-    ["Reading the file", "NES"],
-    ["Availability", "OPEN TO WORK"],
-    ["Pieces on file", models + " MODELS"],
-    ["Access", "GRANTED"],
+    ["Breaking the seal", "OK"],
+    ["Reading the decree", "NES"],
+    ["Standing", "OPEN TO WORK"],
+    ["Works in the vault", models + " MODELS"],
+    ["Admittance", "GRANTED"],
   ];
   let running = false, skip = false, startedAt = 0, finished = false;
   const wait = (ms) => new Promise((r) => setTimeout(r, skip || calm ? 0 : ms));

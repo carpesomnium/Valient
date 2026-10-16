@@ -8,7 +8,9 @@
   --text: #e8e4da;
   --dim: #8d8a82;
   --head: "Cinzel", "Times New Roman", serif;
-  --body: "Jost", system-ui, sans-serif;
+  --body: "Cormorant Garamond", Georgia, serif;
+  --label: "Cinzel", "Times New Roman", serif;
+  --deco: "Cinzel Decorative", "Cinzel", serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,10 +19,10 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--body);
-  font-weight: 300;
-  font-size: 16px;
-  line-height: 1.65;
-  letter-spacing: .01em;
+  font-weight: 500;
+  font-size: 19px;
+  line-height: 1.55;
+  letter-spacing: .005em;
   overflow-x: hidden;
 }
 a { color: inherit; text-decoration: none; }
@@ -210,7 +212,7 @@ h2::after { content: ""; display: block; margin-top: 14px; height: 1px; backgrou
 
 .stats { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
 .stats b { display: block; font-family: var(--head); font-weight: 600; font-size: 22px; line-height: 1.15; color: var(--goldhi); letter-spacing: .06em; }
-.stats span { font-size: 10px; color: var(--dim); letter-spacing: .24em; text-transform: uppercase; font-weight: 400; }
+.stats span { font-size: 9px; color: var(--dim); letter-spacing: .12em; text-transform: uppercase; font-weight: 400; }
 
 /* ---------- models: stack of dark pages ---------- */
 .stack-wrap { padding: 0 30px 6px 0; }
@@ -331,3 +333,75 @@ footer a { color: var(--gold); }
   .track, .logo .l2, .eq i, .open i, .hint, .hud-top .live::before { animation: none !important; }
   .entered .hero > * { animation: none !important; }
 }
+
+/* ================= royal / medieval layer ================= */
+/* small caps labels stay in Cinzel so they read at tiny sizes */
+.boot-tag, .ln, .quiet, .hud-top, .tag, .subtitle, .menu a i, .menu a small, .readout small, .ticker,
+h2 em, .open, .stats span, .more, .count, .hint, .big small, footer, .p-head, .thumb::after { font-family: var(--label); font-weight: 500; }
+.menu a small { text-transform: uppercase; letter-spacing: .14em; font-size: 9px; }
+.ticker, footer { font-size: 10px; }
+.panel p, .card p, .svcs span, .lead { font-size: 19px; line-height: 1.5; }
+.card p { font-size: 17px; }
+.menu a i { min-width: 26px; font-size: 12px; }
+
+/* damask: a faint fleur pattern over the dark */
+.bg::after {
+  content: ""; position: absolute; inset: 0; opacity: .5;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='96' viewBox='0 0 72 96'><g fill='none' stroke='%23c9a96a' stroke-opacity='.07' stroke-width='1'><path d='M36 8c5 9 12 14 12 24 0 6-5 10-12 10s-12-4-12-10c0-10 7-15 12-24z'/><path d='M36 42v20M26 56h20M0 56c12 0 18-8 18-18M72 56c-12 0-18-8-18-18'/><circle cx='0' cy='0' r='3'/><circle cx='72' cy='0' r='3'/><circle cx='0' cy='96' r='3'/><circle cx='72' cy='96' r='3'/></g></svg>");
+  background-size: 72px 96px;
+  mask-image: radial-gradient(ellipse at 50% 0, #000 20%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0, #000 20%, transparent 85%);
+}
+
+/* hero: crown + decorative title */
+.crown { width: 54px; height: auto; color: var(--gold); margin-bottom: 12px; filter: drop-shadow(0 0 8px rgba(201, 169, 106, .35)); }
+.logo .l1 { font-family: var(--label); }
+.logo .l2 { font-family: var(--deco); font-weight: 700; font-size: clamp(24px, 7.4vw, 96px); letter-spacing: .05em; }
+.numeral { font-family: var(--deco); font-weight: 700; -webkit-text-stroke: 1px rgba(201, 169, 106, .16); }
+.subtitle { font-family: var(--label); font-style: normal; }
+.menu a { font-family: var(--label); }
+
+/* chapter headings: ornament sits on the rule */
+h2 { font-family: var(--deco); font-weight: 700; letter-spacing: .1em; padding-bottom: 18px; border-bottom: 1px solid var(--line); position: relative; font-size: clamp(22px, 6.4vw, 40px); }
+h2::after { content: "\269C"; position: absolute; left: 0; bottom: -9px; margin: 0; height: auto; width: auto; background: var(--bg); padding-right: 12px; color: var(--gold); font-size: 15px; line-height: 1; }
+
+/* panels: framed twice, with a diamond on the top rule */
+.panel { position: relative; outline: 1px solid var(--line); outline-offset: 6px; }
+.panel::before {
+  content: "\25C6"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: var(--gold);
+  font-size: 10px; line-height: 1; background: var(--bg); padding: 0 10px;
+}
+.open::before { content: "\269C"; font-size: 13px; letter-spacing: 0; }
+.open i { display: none; }
+.open { letter-spacing: .3em; }
+.stats b, .svcs b, .big span, .card h3 { font-family: var(--deco); font-weight: 700; }
+.stats b { font-size: 20px; }
+.svcs b { font-size: 14px; letter-spacing: .14em; }
+.big span { font-size: 19px; letter-spacing: .06em; }
+.card h3 { font-size: 20px; letter-spacing: .08em; }
+.steps li::before { font-family: var(--label); border-radius: 0; transform: rotate(45deg); }
+.steps li::before { content: counter(s, upper-roman); transform: none; border-radius: 50%; font-size: 11px; }
+
+/* model pages become framed plates */
+.stack .card { outline: 1px solid var(--line); outline-offset: -7px; padding: 16px 16px 24px; }
+.thumb::after, .thumb.pic::after { content: "Plate " counter(spec, upper-roman); letter-spacing: .22em; }
+.thumb { border-color: var(--gold2); }
+.card.soon .thumb { font-family: var(--deco); }
+
+/* buttons feel like seals and plaques */
+.cta, #enter, .sbtn { font-family: var(--label); }
+.cta, #enter { position: relative; }
+.cta::before, #enter::before { content: ""; position: absolute; inset: 3px; border: 1px solid rgba(201, 169, 106, .35); pointer-events: none; }
+.big { outline: 1px solid var(--line); outline-offset: 4px; }
+.count { font-family: var(--deco); font-weight: 700; font-size: 14px; letter-spacing: .12em; }
+
+/* gate */
+.boot h1 { font-family: var(--deco); font-weight: 700; letter-spacing: .06em; font-size: clamp(22px, 7.2vw, 40px); }
+.granted { font-family: var(--deco); font-weight: 700; letter-spacing: .2em; }
+#gate::before {
+  content: ""; position: absolute; inset: 14px; border: 1px solid rgba(201, 169, 106, .3); pointer-events: none;
+  box-shadow: inset 0 0 0 5px #040405, inset 0 0 0 6px rgba(201, 169, 106, .18);
+}
+
+.player { border-color: var(--gold); box-shadow: 0 10px 24px rgba(0, 0, 0, .7), 0 0 0 3px #040405, 0 0 0 4px rgba(201, 169, 106, .3); }
+footer { letter-spacing: .24em; }
