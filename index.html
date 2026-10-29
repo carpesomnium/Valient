@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>My Portfolio! // nes</title>
   <meta name="description" content="Portfolio of nes: full stack Luau programmer for Roblox, open to work.">
-  <meta name="theme-color" content="#040405">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fafaf8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="canonical" href="https://carpesomnium.github.io/Valient/">
@@ -18,202 +20,134 @@
   <meta name="twitter:image" content="https://carpesomnium.github.io/Valient/og.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=17">
-  <noscript><style>#gate{display:none}</style></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=18">
 </head>
 <body>
-  <!-- uplink terminal: the first tap also unlocks audio -->
-  <div id="gate">
-    <div class="boot">
-      <p class="boot-tag">an audience with</p>
-      <h1 aria-label="My Portfolio!">MY PORTFOLIO!</h1>
-      <div id="boot-log" aria-live="polite"></div>
-      <div class="pbar" aria-hidden="true"><i id="boot-bar"></i></div>
-      <p class="granted" id="granted" aria-hidden="true">WELCOME</p>
-      <div id="boot-actions">
-        <button id="enter" type="button"><span>Enter &#9834;</span></button>
-        <button id="enter-mute" type="button" class="quiet">enter without audio</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- background -->
-  <div class="bg" aria-hidden="true"><canvas id="bg"></canvas></div>
-  <div class="fx noise" aria-hidden="true"></div>
-  <div class="fx vig" aria-hidden="true"></div>
-
-  <header class="hero" id="top">
-    <div class="hud-top" aria-hidden="true">
-      <span class="live">Anno MMXXVI</span>
-      <span><b>nes</b></span>
-    </div>
-
-    <svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34 8 11 20 23 32 7 44 23 56 11 60 34Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 38.5H60" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8.5" r="2.3" fill="currentColor"/><circle cx="32" cy="4.5" r="2.3" fill="currentColor"/><circle cx="56" cy="8.5" r="2.3" fill="currentColor"/></svg>
-    <p class="tag">Available for hire</p>
-    <h1 class="logo" aria-label="My Portfolio!"><span class="l1">MY</span><span class="l2">PORTFOLIO!</span></h1>
-    <p class="subtitle">Full stack Luau programmer &middot; 3D modeler</p>
-
-    <div class="numeral" id="numeral" aria-hidden="true">I</div>
-
-    <nav class="menu" id="menu" aria-label="Main">
-      <a href="#about"><i>I</i><span>About</span><small>who am i?</small></a>
-      <a href="#models"><i>II</i><span>3D Models</span><small>my work</small></a>
-      <a href="#hire"><i>III</i><span>Hire Me</span><small>open to work</small></a>
-      <a href="#contact"><i>IV</i><span>Contact</span><small>say hello</small></a>
-      <a href="https://github.com/carpesomnium" target="_blank" rel="noopener"><i>V</i><span>GitHub</span><small>carpesomnium</small></a>
-      <a href="#contact" data-copy="kerosionn" class="copy"><i>VI</i><span>Discord</span><small>tap to copy @kerosionn</small></a>
+  <header class="top">
+    <a class="brand" href="#top">nes</a>
+    <nav aria-label="Main">
+      <a href="#about">About</a>
+      <a href="#models">Models</a>
+      <a href="#hire">Hire</a>
+      <a href="#contact">Contact</a>
     </nav>
-
-    <div class="bars" aria-hidden="true">
-      <div class="readout"><small>Alias</small><b>nes</b></div>
-      <div class="readout warn"><small>Status</small><b>Open to work</b></div>
-    </div>
   </header>
 
-  <div class="ticker" aria-hidden="true">
-    <div class="track">
-      <span>NES &#9884; LUAU &#9884; 3D MODELING &#9884; OPEN TO WORK &#9884; </span>
-      <span>NES &#9884; LUAU &#9884; 3D MODELING &#9884; OPEN TO WORK &#9884; </span>
-      <span>NES &#9884; LUAU &#9884; 3D MODELING &#9884; OPEN TO WORK &#9884; </span>
-    </div>
-  </div>
-
   <main>
-    <section id="about" class="reveal">
-      <h2><em>Chapter I</em>About</h2>
-      <div class="panel">
-        <p class="open"><i></i>Open to work</p>
-        <p>Hey, my name is <b>nes</b>, I&rsquo;ve been doing roblox game development for about 2 years now on and off. More specifically programming, I am a professional and proficient full stack luau programmer and can ship out stuff you need fast.</p>
-        <p>I&rsquo;m also looking for job opportunities whether it be for teams or small groups, I&rsquo;ve recently gotten into 3D Modeling as well. You can find my contact information below.</p>
-        <a class="cta" href="#hire"><span>Hire me <b class="arr">&darr;</b></span></a>
-        <ul class="stats">
-          <li><b>Luau</b><span>Full stack</span></li>
-          <li><b>~2 yrs</b><span>Roblox dev</span></li>
-          <li><b>Fast</b><span>Ships quick</span></li>
-        </ul>
+    <section class="hero" id="top">
+      <p class="status"><i></i>Open to work</p>
+      <h1>My<br>Portfolio!</h1>
+      <p class="lede">Full stack Luau programmer &middot; 3D modeler</p>
+      <div class="actions">
+        <a class="btn" href="#hire">Hire me</a>
+        <a class="btn ghost" href="#models">See my models</a>
       </div>
+    </section>
+
+    <section id="about" class="reveal">
+      <h2>About</h2>
+      <p>Hey, my name is <b>nes</b>, I&rsquo;ve been doing roblox game development for about 2 years now on and off. More specifically programming, I am a professional and proficient full stack luau programmer and can ship out stuff you need fast.</p>
+      <p>I&rsquo;m also looking for job opportunities whether it be for teams or small groups, I&rsquo;ve recently gotten into 3D Modeling as well. You can find my contact information below.</p>
+      <ul class="stats">
+        <li><b>Luau</b><span>Full stack</span></li>
+        <li><b>~2 yrs</b><span>Roblox dev</span></li>
+        <li><b>Fast</b><span>Ships quick</span></li>
+      </ul>
     </section>
 
     <section id="models" class="reveal">
-      <h2><em>Chapter II</em>3D Models</h2>
-      <div class="stack-wrap">
-        <div class="stack" id="stack" tabindex="0" role="group" aria-roledescription="carousel" aria-label="3D models. Swipe the top page, or use the arrows.">
-          <article class="card">
-            <a class="thumb pic" href="images/rifle.jpg" target="_blank" rel="noopener" aria-label="Open the AR-10 model image full size">
-              <img src="images/rifle.jpg" width="538" height="562" loading="lazy" alt="Two views of the AR-10, a grey hard-surface rifle 3D model with the NES watermark">
-            </a>
-            <h3>AR-10</h3>
-            <p>Hard-surface rifle model, shown from two angles.</p>
-            <a href="images/rifle.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-          </article>
-          <article class="card">
-            <a class="thumb pic" href="images/overture.jpg" target="_blank" rel="noopener" aria-label="Open the Overture model image full size">
-              <img src="images/overture.jpg" width="1400" height="787" loading="lazy" alt="The Overture, a black and silver revolver 3D model from Cyberpunk, with the NES watermark">
-            </a>
-            <h3>Overture</h3>
-            <p>Revolver from Cyberpunk.</p>
-            <a href="images/overture.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-          </article>
-          <article class="card">
-            <a class="thumb pic" href="images/hawk.jpg" target="_blank" rel="noopener" aria-label="Open the Hawk model image full size">
-              <img src="images/hawk.jpg" width="1280" height="720" loading="lazy" alt="The Hawk, a silver and orange compact rifle 3D model from Cyberpunk, with the NES watermark">
-            </a>
-            <h3>Hawk</h3>
-            <p>Weapon from Cyberpunk.</p>
-            <a href="images/hawk.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-          </article>
-          <article class="card">
-            <a class="thumb pic" href="images/sentry.jpg" target="_blank" rel="noopener" aria-label="Open the Sentry model image full size">
-              <img src="images/sentry.jpg" width="1400" height="787" loading="lazy" alt="The Sentry, a grey mounted gun turret 3D model with the NES watermark">
-            </a>
-            <h3>Sentry</h3>
-            <p>Mounted turret.</p>
-            <a href="images/sentry.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-          </article>
-          <article class="card">
-          <a class="thumb pic" href="images/tank.jpg" target="_blank" rel="noopener" aria-label="Open the Battle Tank model image full size">
+      <h2>3D Models</h2>
+      <div class="works">
+        <figure class="work">
+          <a href="images/rifle.jpg" target="_blank" rel="noopener" aria-label="Open the AR-10 model image full size">
+            <img src="images/rifle.jpg" width="538" height="562" loading="lazy" alt="Two views of the AR-10, a grey hard-surface rifle 3D model with the NES watermark">
+          </a>
+          <figcaption><b>AR-10</b><span>Hard-surface rifle model, shown from two angles.</span></figcaption>
+        </figure>
+        <figure class="work">
+          <a href="images/overture.jpg" target="_blank" rel="noopener" aria-label="Open the Overture model image full size">
+            <img src="images/overture.jpg" width="1400" height="787" loading="lazy" alt="The Overture, a black and silver revolver 3D model from Cyberpunk, with the NES watermark">
+          </a>
+          <figcaption><b>Overture</b><span>Revolver from Cyberpunk.</span></figcaption>
+        </figure>
+        <figure class="work">
+          <a href="images/hawk.jpg" target="_blank" rel="noopener" aria-label="Open the Hawk model image full size">
+            <img src="images/hawk.jpg" width="1280" height="720" loading="lazy" alt="The Hawk, a silver and orange compact rifle 3D model from Cyberpunk, with the NES watermark">
+          </a>
+          <figcaption><b>Hawk</b><span>Weapon from Cyberpunk.</span></figcaption>
+        </figure>
+        <figure class="work">
+          <a href="images/sentry.jpg" target="_blank" rel="noopener" aria-label="Open the Sentry model image full size">
+            <img src="images/sentry.jpg" width="1400" height="787" loading="lazy" alt="The Sentry, a grey mounted gun turret 3D model with the NES watermark">
+          </a>
+          <figcaption><b>Sentry</b><span>Mounted turret.</span></figcaption>
+        </figure>
+        <figure class="work">
+          <a href="images/tank.jpg" target="_blank" rel="noopener" aria-label="Open the Battle Tank model image full size">
             <img src="images/tank.jpg" width="1172" height="620" loading="lazy" alt="A desert-tan main battle tank 3D model with the NES watermark">
           </a>
-          <h3>Battle Tank</h3>
-          <p>Main battle tank model in desert tan.</p>
-          <a href="images/tank.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-        </article>
-        <article class="card">
-          <a class="thumb pic" href="images/apc.jpg" target="_blank" rel="noopener" aria-label="Open the Armored Carrier model image full size">
+          <figcaption><b>Battle Tank</b><span>Main battle tank model in desert tan.</span></figcaption>
+        </figure>
+        <figure class="work">
+          <a href="images/apc.jpg" target="_blank" rel="noopener" aria-label="Open the Armored Carrier model image full size">
             <img src="images/apc.jpg" width="871" height="438" loading="lazy" alt="A green eight-wheeled armored personnel carrier 3D model in a viewport, with the NES watermark">
           </a>
-          <h3>Armored Carrier</h3>
-          <p>Eight-wheeled armored vehicle model.</p>
-          <a href="images/apc.jpg" target="_blank" rel="noopener" class="more">View full &rarr;</a>
-        </article>
-        <article class="card soon">
-            <div class="thumb"><span>Pending</span></div>
-            <h3>More coming</h3>
-            <p>New models are on the way.</p>
-          </article>
-        </div>
-        <div class="stack-ui">
-          <button type="button" class="sbtn" id="prev" aria-label="Previous model">&larr;</button>
-          <span class="count" id="count" aria-live="polite">I / VII</span>
-          <button type="button" class="sbtn" id="next" aria-label="Next model">&rarr;</button>
-          <span class="hint" id="hint">&larr; swipe the pages</span>
-        </div>
+          <figcaption><b>Armored Carrier</b><span>Eight-wheeled armored vehicle model.</span></figcaption>
+        </figure>
       </div>
+      <p class="more-soon">More coming. New models are on the way.</p>
     </section>
 
     <section id="hire" class="reveal">
-      <h2><em>Chapter III</em>Hire Me</h2>
-      <div class="panel">
-        <p class="open"><i></i>Open to work</p>
-        <p>Looking for a scripter for your Roblox game? I work with teams and small groups, and I ship fast.</p>
-        <ul class="svcs">
-          <li><b>Luau scripting</b><span>Full stack: gameplay systems, server and client code, data and UI logic.</span></li>
-          <li><b>3D modeling</b><span>Hard-surface props and weapons for your game.</span></li>
-          <li><b>Fast turnaround</b><span>Tell me what you need and I&rsquo;ll tell you how long it takes.</span></li>
-        </ul>
-        <ol class="steps">
-          <li>Message me on Discord</li>
-          <li>Tell me what you need</li>
-          <li>I reply with a plan and timeline</li>
-        </ol>
-        <p class="sub">Rates depend on the job. Message me for a quote.</p>
-        <button class="big hirebtn" type="button" data-copy="kerosionn">
-          <small>Discord &mdash; tap to copy</small><span>@kerosionn</span>
-        </button>
-      </div>
+      <h2>Hire Me</h2>
+      <p class="intro">Looking for a scripter for your Roblox game? I work with teams and small groups, and I ship fast.</p>
+      <ul class="svcs">
+        <li><b>Luau scripting</b><span>Full stack: gameplay systems, server and client code, data and UI logic.</span></li>
+        <li><b>3D modeling</b><span>Hard-surface props and weapons for your game.</span></li>
+        <li><b>Fast turnaround</b><span>Tell me what you need and I&rsquo;ll tell you how long it takes.</span></li>
+      </ul>
+      <ol class="steps">
+        <li>Message me on Discord</li>
+        <li>Tell me what you need</li>
+        <li>I reply with a plan and timeline</li>
+      </ol>
+      <p class="note">Rates depend on the job. Message me for a quote.</p>
+      <button class="btn big-btn" type="button" data-copy="kerosionn">
+        <small>Discord &mdash; tap to copy</small><span>@kerosionn</span>
+      </button>
     </section>
 
     <section id="contact" class="reveal">
-      <h2><em>Chapter IV</em>Contact</h2>
-      <p class="lead">Open to teams and small groups. Reach me on Discord or GitHub.</p>
-      <div class="links">
-        <a class="big" href="https://github.com/carpesomnium" target="_blank" rel="noopener">
-          <small>GitHub</small><span>carpesomnium</span>
+      <h2>Contact</h2>
+      <p class="intro">Open to teams and small groups. Reach me on Discord or GitHub.</p>
+      <div class="rows">
+        <a class="row" href="https://github.com/carpesomnium" target="_blank" rel="noopener">
+          <small>GitHub</small><span>carpesomnium</span><i aria-hidden="true">&nearr;</i>
         </a>
-        <button class="big" type="button" data-copy="kerosionn">
-          <small>Discord &mdash; tap to copy</small><span>@kerosionn</span>
+        <button class="row" type="button" data-copy="kerosionn">
+          <small>Discord &mdash; tap to copy</small><span>@kerosionn</span><i aria-hidden="true">Copy</i>
         </button>
       </div>
     </section>
   </main>
 
   <footer>
-    <span>My Portfolio! &#9884; nes</span>
-    <a href="#top">back to top &uarr;</a>
+    <span>My Portfolio! &mdash; nes</span>
+    <a href="#top">Back to top &uarr;</a>
   </footer>
 
-  <!-- music: a small visible player (see MUSIC in script.js to change the song) -->
-  <aside id="player" class="player" aria-label="Music player">
+  <!-- music: tap to open and play. The video stays visible while it plays (YouTube's rules). -->
+  <aside id="player" class="player min" aria-label="Music player">
     <div class="p-head">
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       <span class="p-title">Cairo &mdash; Zamar</span>
-      <button id="p-toggle" type="button" aria-label="Minimize music player">&times;</button>
+      <button id="p-toggle" type="button" aria-label="Open music player"></button>
     </div>
     <div class="p-body"><div id="yt"></div></div>
     <p class="p-note" id="p-note" hidden></p>
   </aside>
 
-  <script src="script.js?v=17"></script>
+  <script src="script.js?v=18"></script>
 </body>
 </html>
